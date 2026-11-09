@@ -10,7 +10,7 @@ hosted service.
 ## Download
 
 Get the latest bundle from [Releases](../../releases/latest). The current
-version is **0.5.0**: download `eve-0.5.0-linux-x64.tar.gz` and its `.sha256`
+version is **0.1.0**: download `eve-0.1.0-linux-x64.tar.gz` and its `.sha256`
 into the same folder.
 
 ## Requirements
@@ -29,9 +29,9 @@ Go and the EVE chain source are **not** required. The bundle includes a compiled
 
 ```bash
 # verify the download before extracting
-sha256sum -c eve-0.5.0-linux-x64.tar.gz.sha256
+sha256sum -c eve-0.1.0-linux-x64.tar.gz.sha256
 
-tar -xzf eve-0.5.0-linux-x64.tar.gz
+tar -xzf eve-0.1.0-linux-x64.tar.gz
 export PATH="$PWD/eve-linux-x64:$PATH"
 
 eve doctor
@@ -56,7 +56,36 @@ eve call submit_amount amount=100                      # call one endpoint and s
 
 `eve run` passes the local chain's address and keys to your scripts, so run
 tests through it rather than with plain `node` or `npm test`. Stop the chain
-with `eve dev --teardown`.
+with `eve dev --teardown`; start again from an empty chain, with the same
+local keys, using `eve dev --reset --yes`.
+
+## Connect your own website
+
+Run your website on this computer as you normally do and point it at the local
+chain. `eve dev` prints the settings, and Studio's **Website** screen shows them
+with copy buttons:
+
+```bash
+EVE_URL=http://127.0.0.1:3003/api
+EVE_TENANT_ID=<your institution>
+EVE_SECRET_KEY=sk_local_...        # server code only; can call every endpoint
+EVE_PUBLISHABLE_KEY=pk_local_...   # web pages; public endpoints only
+```
+
+Local endpoints have the same shape as live ones
+(`/api/t/<institution>/<endpoint>`), so going live means changing `EVE_URL` and
+the keys, not your code. Pages on `localhost` (any port) may call public
+endpoints. On Windows, a browser reaching a chain inside WSL uses
+`http://localhost:3003/api`.
+
+See every call your website makes, and what the chain did with it:
+
+```bash
+eve activity --follow
+```
+
+or open Studio's **Activity** screen. A live institution starts with empty
+state: nothing from your local chain is copied online.
 
 ## What the bundle contains
 
@@ -79,6 +108,7 @@ eve validate             # structural + rule-syntax checks, offline
 eve dev                  # disposable local chain and gateway (--detach, --teardown)
 eve run rules/example.js # run a project script with the bundle's dependencies
 eve call <endpoint> ...  # call an endpoint and show each rule step and the state change
+eve activity             # the calls the local chain received and what happened (--follow)
 eve studio               # loopback-only local UI for the workspace
 eve pack                 # deterministic dist/*.eve.json with a SHA-256 digest
 ```
